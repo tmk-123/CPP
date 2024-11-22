@@ -26,7 +26,7 @@ int main() {
         cout << maxProduct << endl;
     }
 }
-
+ 
 // cách dài nhưng AC
 // int n;
 // cin >> n;
