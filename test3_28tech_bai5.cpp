@@ -53,7 +53,7 @@ public:
         cout << "BLOOD : " << Blood << "\n";
         cout << Alive << "\n";
         cout << "--------------------\n";
-    }
+    } 
 };
 
 int main() {
