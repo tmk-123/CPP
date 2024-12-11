@@ -1,109 +1,87 @@
-#include<iostream>
-#include<map>
-#include<string>
-#include<algorithm>
+#include<bits/stdc++.h>
 
 using namespace std;
 
-int IDKH = 1, IDMH = 1, IDHD = 1;
-
+int cnt1 = 1, cnt2 = 1, cnt3 = 1;
 class KhachHang;
 class MatHang;
-class HoaDon;
+vector<KhachHang> KH;
+vector<MatHang> MH;
 
-map<string, KhachHang> KH;
-map<string, MatHang> MH;
-
-class KhachHang{
-private:
-	string clientCode, clientName, gender, birthday, address;	
+class KhachHang {
 public:
-	KhachHang(){};
-	friend class HoaDon;
-	friend istream& operator >> (istream& in, KhachHang &a){
-		if (IDKH < 10) a.clientCode = "KH00" + to_string(IDKH++);
-		else a.clientCode = "KH0" + to_string(IDKH++);
+	string clientCode, clientName, gender, bd, address;
 
+	friend istream& operator >> (istream& in, KhachHang& a) {
 		getline(in >> ws, a.clientName);
-		getline(in, a.gender);
-		getline(in, a.birthday);
-		getline(in, a.address);
-
-		KH[a.clientCode] = a;
+		in >> a.gender >> a.bd;
+		getline(in >> ws, a.address);
+		string s = to_string(cnt1++);
+		a.clientCode = "KH" + string(3 - s.length(), '0') + s;
+		KH.push_back(a);
 		return in;
-	}
-	string GetClientName(){
-		return clientName;
-	}
-	string GetAddress(){
-		return address;
 	}
 };
 
-class MatHang{
-private:
+class MatHang {
+public:
 	string productCode, productName, unit;
 	int buy, sell;
-public:
-	MatHang(){};
-	friend class HoaDon;
-	friend istream& operator >> (istream& in, MatHang &a){
-		if (IDMH < 10) a.productCode = "MH00" + to_string(IDMH++);
-		else a.productCode = "MH0" + to_string(IDMH++);
 
+	friend istream& operator >> (istream& in, MatHang a) {
 		getline(in >> ws, a.productName);
-		getline(in, a.unit);
+		getline(in >> ws, a.unit);
 		in >> a.buy >> a.sell;
-
-		MH[a.productCode] = a;
+		string s = to_string(cnt2++);
+		a.productCode = "MH" + string(3 - s.length(), '0') + s;
+		MH.push_back(a);
 		return in;
-	}
-	string GetProductName(){
-		return productName;
-	}
-	int GetBuy(){
-		return buy;
-	}
-	int GetSell(){
-		return sell;
 	}
 };
 
-class HoaDon{
-private:
-	string invoiceCode, clientCode, productCode;
-	int quantity, profit;
+class HoaDon {
 public:
-	HoaDon(){};
-	friend istream& operator >> (istream &in, HoaDon &a){
-		if (IDHD < 10) a.invoiceCode = "HD00" + to_string(IDHD++);
-		else a.invoiceCode = "HD0" + to_string(IDHD++);
+	string invoiceCode, client, product;
+	int quantity, profit;
+	KhachHang kh;
+	MatHang mh;
 
-		in >> a.clientCode >> a.productCode >> a.quantity;
-		
-		a.profit = (MH[a.productCode].GetSell() - MH[a.productCode].GetBuy()) * a.quantity;
+	friend istream& operator >> (istream& in, HoaDon& a) {
+		in >> a.client >> a.product >> a.quantity;
+		string s = to_string(cnt3++);
+		a.invoiceCode = "HD" + string(3 - s.length(), '0') + s;
+
+		for (auto x : KH) {
+			if (a.client == x.clientCode) {
+				a.kh = x;
+				break;
+			}
+		}
+
+		for (auto x : MH) {
+			if (a.product == x.productCode) {
+				a.mh = x;
+				break;
+			}
+		}
+		a.profit = a.quantity * (a.mh.sell - a.mh.buy);
+
 		return in;
-	} 
-	friend ostream& operator << (ostream &out, HoaDon a){
-		out << a.invoiceCode << " "
-			<< KH[a.clientCode].GetClientName() << " "
-			<< KH[a.clientCode].GetAddress() << " "
-			<< MH[a.productCode].GetProductName() << " "
-			<< a.quantity << " "
-			<< a.quantity * MH[a.productCode].GetSell() << " "
-			<< a.profit << endl;
+	}
+
+	friend ostream& operator << (ostream& out, HoaDon& a) {
+		out << a.invoiceCode << " " << a.kh.clientName << " " << a.kh.address << " " << a.mh.productName << " " 
+			<< a.quantity << " " << a.mh.sell * a.quantity << " " << a.profit << endl;
+
 		return out;
-	}
-	int GetProfit(){
-		return profit;
-	}
+	} 
 };
 
-bool compare(HoaDon a, HoaDon b){
-	return a.GetProfit() >= b.GetProfit();
+bool compare(HoaDon a, HoaDon b) {
+	return a.profit >= b.profit;
 }
 
-void sapxep(HoaDon dshd[], int k){
+void sapxep(HoaDon dshd[], int k) {
 	sort(dshd, dshd + k, compare);
 }
 int main(){
